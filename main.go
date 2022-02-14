@@ -30,12 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if keyFile == "" {
-		fmt.Println("GCP key.json required")
-		os.Exit(1)
-	}
-
-	if keyFile == "" {
+	if file == "" {
 		fmt.Println("File to upload required")
 		os.Exit(1)
 	}
@@ -49,7 +44,13 @@ func main() {
 
 func uploadFile(w io.Writer, bucket, object, jsonPath string) error {
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(jsonPath))
+	var client *storage.Client
+	var err error
+	if jsonPath == "" {
+		client, err = storage.NewClient(ctx)
+	} else {
+		client, err = storage.NewClient(ctx, option.WithCredentialsFile(jsonPath))
+	}
 	if err != nil {
 		return fmt.Errorf("storage.NewClient: %v", err)
 	}
